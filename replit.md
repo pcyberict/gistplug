@@ -1,8 +1,8 @@
 # Overview
 
-This is a Flask-based live streaming platform called "PCYBER TV" that allows users to view sports streams and participate in live chat. The platform features a public interface for viewing streams, an admin dashboard for managing content, and a real-time chat system. The application supports both YouTube and Facebook video embeds, with category-based organization and pagination for better user experience.
+This is a PHP-based live streaming platform called "PCYBER TV" that allows users to view sports streams and participate in live chat. The platform features a public interface for viewing streams, an admin dashboard for managing content, and a real-time chat system. The application supports both YouTube and Facebook video embeds, with category-based organization and pagination for better user experience.
 
-**Status**: Successfully configured for Replit environment with Flask as the primary frontend running on port 5000.
+**Status**: Successfully converted to pure PHP implementation and configured for Replit environment running on port 5000.
 
 # User Preferences
 
@@ -11,7 +11,7 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-The application uses server-side templating with Jinja2 and Bootstrap 5 for responsive design. It implements a dual-theme system (light/dark mode) with CSS custom properties for consistent styling across all pages. The interface includes:
+The application uses server-side templating with PHP includes and Bootstrap 5 for responsive design. It implements a dual-theme system (light/dark mode) with CSS custom properties for consistent styling across all pages. The interface includes:
 
 - Public stream viewing pages with embedded video players
 - Admin dashboard with stream management capabilities  
@@ -20,12 +20,12 @@ The application uses server-side templating with Jinja2 and Bootstrap 5 for resp
 - Responsive navigation with sticky header
 
 ## Backend Architecture
-Built on Flask with a modular structure separating concerns:
+Built with PHP and a modular structure separating concerns:
 
-- **Models**: SQLAlchemy ORM with User model for authentication
-- **Authentication**: Flask-Bcrypt for password hashing with hardcoded admin credentials
+- **Models**: PDO-based User and Database classes for authentication
+- **Authentication**: PHP password_hash/password_verify for secure password handling
 - **Data Storage**: Hybrid approach using SQLite for users and JSON files for streams/chat
-- **Rate Limiting**: In-memory rate limiting using defaultdict for chat messages
+- **Rate Limiting**: Session-based rate limiting for chat messages
 - **Content Filtering**: Basic profanity filter with configurable word list
 
 ## Data Storage Solutions
@@ -49,18 +49,17 @@ Implements a simple two-tier authentication system:
 - **Font Awesome**: Icon library for enhanced user interface
 - **YouTube API**: Embedded video players for YouTube streams
 - **Facebook Videos**: Direct iframe embedding for Facebook video content
-- **Flask Ecosystem**: SQLAlchemy for ORM, Bcrypt for password hashing
-- **Database Options**: Configured for both SQLite (development) and MySQL (production via environment variables)
+- **PHP**: Native PDO for database operations, password hashing functions
+- **Database Options**: SQLite for user management with JSON files for streams/chat data
 
 ## Replit Environment Setup
 
-The application has been successfully configured for Replit:
-- **Primary Backend**: Flask Python application (app.py)
-- **Development Server**: Running on 0.0.0.0:5000 with debug mode
-- **Database**: SQLite database in instance/users.db directory
-- **Dependencies**: All Python packages installed via pip
-- **Deployment**: Configured for autoscale deployment target
-- **Legacy PHP**: PHP implementation available but Flask is the active system
+The application has been successfully converted to pure PHP:
+- **Primary Backend**: PHP application with index.php as the main router
+- **Development Server**: PHP built-in server running on 0.0.0.0:5000
+- **Database**: SQLite database in instance/users.db directory managed by PHP PDO
+- **Styling**: Bootstrap 5 with custom CSS embedded in templates for glass-morphism design
+- **Deployment**: Configured for autoscale deployment target with PHP server
 
 ## Admin Access
 - **Username**: admin
