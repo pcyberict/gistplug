@@ -883,25 +883,38 @@ $total_users = count(glob('instance/users.db')) ? 1 : 0; // Simple user count
         themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
       }
 
-      // Navigation
+      // Navigation with proper section switching
       navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
           e.preventDefault();
+          
+          // Don't handle external links
+          if (this.getAttribute('href') === '/') {
+            window.location.href = '/';
+            return;
+          }
+          
           const targetSection = this.dataset.section;
           
-          // Update active nav
+          // Update active nav - remove from all, add to current
           navLinks.forEach(nav => nav.classList.remove('active'));
           this.classList.add('active');
           
-          // Show target section
-          contentSections.forEach(section => section.classList.remove('active'));
+          // Show target section - hide all, show target
+          contentSections.forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
+          });
+          
           const targetElement = document.getElementById(targetSection + '-section');
           if (targetElement) {
             targetElement.classList.add('active');
+            targetElement.style.display = 'block';
           }
           
           // Update header title
-          headerTitle.textContent = this.querySelector('span').textContent;
+          const sectionTitle = this.querySelector('span').textContent;
+          headerTitle.textContent = sectionTitle;
           
           // Close sidebar on mobile
           if (window.innerWidth < 768) {
@@ -909,6 +922,21 @@ $total_users = count(glob('instance/users.db')) ? 1 : 0; // Simple user count
             overlay.classList.remove('active');
           }
         });
+      });
+
+      // Initialize first section properly
+      const firstSection = document.getElementById('dashboard-section');
+      if (firstSection) {
+        firstSection.style.display = 'block';
+        firstSection.classList.add('active');
+      }
+      
+      // Hide other sections initially
+      contentSections.forEach(section => {
+        if (section.id !== 'dashboard-section') {
+          section.style.display = 'none';
+          section.classList.remove('active');
+        }
       });
 
       // Auto-close sidebar on larger screens
