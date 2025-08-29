@@ -121,3 +121,7 @@ flask
 flask-bcrypt
 flask-sqlalchemy
 python-dotenv
+flask
+flask-bcrypt
+flask-sqlalchemy
+python-dotenv

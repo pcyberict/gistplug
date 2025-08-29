@@ -2,6 +2,8 @@
 
 This is a Flask-based live streaming platform called "PCYBER TV" that allows users to view sports streams and participate in live chat. The platform features a public interface for viewing streams, an admin dashboard for managing content, and a real-time chat system. The application supports both YouTube and Facebook video embeds, with category-based organization and pagination for better user experience.
 
+**Status**: Successfully configured for Replit environment with Flask as the primary frontend running on port 5000.
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -49,3 +51,18 @@ Implements a simple two-tier authentication system:
 - **Facebook Videos**: Direct iframe embedding for Facebook video content
 - **Flask Ecosystem**: SQLAlchemy for ORM, Bcrypt for password hashing
 - **Database Options**: Configured for both SQLite (development) and MySQL (production via environment variables)
+
+## Replit Environment Setup
+
+The application has been successfully configured for Replit:
+- **Primary Backend**: Flask Python application (app.py)
+- **Development Server**: Running on 0.0.0.0:5000 with debug mode
+- **Database**: SQLite database in instance/users.db directory
+- **Dependencies**: All Python packages installed via pip
+- **Deployment**: Configured for autoscale deployment target
+- **Legacy PHP**: PHP implementation available but Flask is the active system
+
+## Admin Access
+- **Username**: admin
+- **Password**: Pcyber50@
+- **Admin Panel**: /admin-login
