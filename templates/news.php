@@ -2,6 +2,12 @@
 $page_title = 'Sports News - PCYBER TV';
 $current_page = 'news';
 $stream_count = count(StreamManager::loadStreams());
+
+// Load published news articles
+$published_news = NewsManager::getPublishedNews();
+$featured_news = NewsManager::getFeaturedNews();
+$categories = NewsManager::getCategories();
+
 include 'templates/header.php';
 ?>
 
@@ -15,31 +21,34 @@ include 'templates/header.php';
   <div class="news-categories mb-4">
     <div class="category-tabs">
       <a href="#" class="category-tab active" data-category="all">All</a>
-      <a href="#" class="category-tab" data-category="football">Football</a>
-      <a href="#" class="category-tab" data-category="transfer">Transfer News</a>
-      <a href="#" class="category-tab" data-category="champions">Champions League</a>
-      <a href="#" class="category-tab" data-category="premier">Premier League</a>
-      <a href="#" class="category-tab" data-category="tennis">Tennis</a>
-      <a href="#" class="category-tab" data-category="basketball">Basketball</a>
+      <?php foreach ($categories as $category): ?>
+      <a href="#" class="category-tab" data-category="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars(ucfirst($category)); ?></a>
+      <?php endforeach; ?>
     </div>
   </div>
 
   <!-- Featured News -->
   <div class="featured-news mb-5">
+    <?php if (!empty($featured_news)): ?>
+    <?php $featured_article = $featured_news[0]; ?>
     <div class="row">
       <div class="col-lg-8">
         <article class="featured-article">
           <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=400&fit=crop" alt="Champions League Trophy" class="img-fluid">
-            <div class="article-category">Champions League</div>
+            <?php if (!empty($featured_article['featured_image'])): ?>
+            <img src="/<?php echo htmlspecialchars($featured_article['featured_image']); ?>" alt="<?php echo htmlspecialchars($featured_article['title']); ?>" class="img-fluid">
+            <?php else: ?>
+            <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=400&fit=crop" alt="Sports News" class="img-fluid">
+            <?php endif; ?>
+            <div class="article-category"><?php echo htmlspecialchars($featured_article['category']); ?></div>
           </div>
           <div class="article-content">
-            <h2 class="article-title">PSG to face Barcelona in Champions League, Real Madrid draw Man City & Liverpool</h2>
-            <p class="article-excerpt">The UEFA Champions League draw has been conducted, setting up blockbuster matchups including PSG vs Barcelona and Real Madrid facing Manchester City in what promises to be an exciting tournament.</p>
+            <h2 class="article-title"><?php echo htmlspecialchars($featured_article['title']); ?></h2>
+            <p class="article-excerpt"><?php echo htmlspecialchars($featured_article['excerpt'] ?: substr(strip_tags($featured_article['content']), 0, 200) . '...'); ?></p>
             <div class="article-meta">
-              <span class="author">By Sports Desk</span>
-              <span class="date">2 hours ago</span>
-              <span class="read-time">3 min read</span>
+              <span class="author">By <?php echo htmlspecialchars($featured_article['author']); ?></span>
+              <span class="date"><?php echo NewsManager::formatTimeAgo($featured_article['created_at']); ?></span>
+              <span class="read-time"><?php echo ceil(str_word_count(strip_tags($featured_article['content'])) / 200); ?> min read</span>
             </div>
           </div>
         </article>
@@ -47,230 +56,102 @@ include 'templates/header.php';
       
       <div class="col-lg-4">
         <div class="trending-news">
-          <h3 class="section-title">Most Read</h3>
+          <h3 class="section-title">Recent Articles</h3>
+          <?php 
+          $recent_articles = array_slice($published_news, 1, 3); // Skip the featured article
+          foreach ($recent_articles as $article): 
+          ?>
           <article class="trending-item">
-            <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=150&h=100&fit=crop" alt="Transfer News" class="trending-image">
+            <?php if (!empty($article['featured_image'])): ?>
+            <img src="/<?php echo htmlspecialchars($article['featured_image']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="trending-image">
+            <?php else: ?>
+            <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=150&h=100&fit=crop" alt="News" class="trending-image">
+            <?php endif; ?>
             <div class="trending-content">
-              <h4>Transfer News LIVE: Newcastle agree record deal for Woltemade, Spurs set to sign Simons</h4>
+              <h4><?php echo htmlspecialchars(substr($article['title'], 0, 60) . (strlen($article['title']) > 60 ? '...' : '')); ?></h4>
               <div class="trending-meta">
-                <span class="category">Transfer News</span>
-                <span class="time">Updated 1h ago</span>
+                <span class="category"><?php echo htmlspecialchars($article['category']); ?></span>
+                <span class="time"><?php echo NewsManager::formatTimeAgo($article['created_at']); ?></span>
               </div>
             </div>
           </article>
+          <?php endforeach; ?>
           
-          <article class="trending-item">
-            <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=150&h=100&fit=crop" alt="Premier League" class="trending-image">
-            <div class="trending-content">
-              <h4>Alexander-Arnold dropped from England squad, Anderson and Spence receive maiden call-ups</h4>
-              <div class="trending-meta">
-                <span class="category">Premier League</span>
-                <span class="time">3h ago</span>
-              </div>
-            </div>
-          </article>
-          
-          <article class="trending-item">
-            <img src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=150&h=100&fit=crop" alt="Football Manager" class="trending-image">
-            <div class="trending-content">
-              <h4>Fenerbahce part ways with Jose Mourinho after failing to reach Champions League</h4>
-              <div class="trending-meta">
-                <span class="category">Transfer News</span>
-                <span class="time">4h ago</span>
-              </div>
-            </div>
-          </article>
+          <?php if (empty($recent_articles)): ?>
+          <div class="text-center py-4">
+            <p class="text-muted">No recent articles available. Check back soon!</p>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
+    <?php else: ?>
+    <div class="text-center py-5">
+      <h3>No Featured Articles Yet</h3>
+      <p class="text-muted">Featured articles will appear here once published.</p>
+    </div>
+    <?php endif; ?>
   </div>
 
   <!-- News Grid -->
   <div class="news-grid">
     <div class="row">
-      <!-- Transfer News Section -->
-      <div class="col-12 mb-4">
-        <div class="section-header">
-          <h3 class="section-title">Transfer News</h3>
-          <a href="#" class="section-link">More Transfer News →</a>
+      <?php if (!empty($published_news)): ?>
+        <?php 
+        // Skip the featured article (first one) and show the rest
+        $remaining_articles = array_slice($published_news, empty($featured_news) ? 0 : 1);
+        
+        if (!empty($remaining_articles)):
+          foreach ($remaining_articles as $index => $article): 
+        ?>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <article class="news-card">
+            <div class="news-image">
+              <?php if (!empty($article['featured_image'])): ?>
+              <img src="/<?php echo htmlspecialchars($article['featured_image']); ?>" alt="<?php echo htmlspecialchars($article['title']); ?>" class="img-fluid">
+              <?php else: ?>
+              <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=250&fit=crop" alt="Sports News" class="img-fluid">
+              <?php endif; ?>
+              <div class="news-category"><?php echo htmlspecialchars($article['category']); ?></div>
+            </div>
+            <div class="news-content">
+              <h4 class="news-title"><?php echo htmlspecialchars($article['title']); ?></h4>
+              <p class="news-excerpt"><?php echo htmlspecialchars($article['excerpt'] ?: substr(strip_tags($article['content']), 0, 120) . '...'); ?></p>
+              <div class="news-meta">
+                <span class="date"><?php echo NewsManager::formatTimeAgo($article['created_at']); ?></span>
+                <span class="read-time"><?php echo ceil(str_word_count(strip_tags($article['content'])) / 200); ?> min read</span>
+              </div>
+            </div>
+          </article>
+        </div>
+        <?php 
+          endforeach;
+        else: 
+        ?>
+        <div class="col-12">
+          <div class="text-center py-5">
+            <h3>No News Articles Yet</h3>
+            <p class="text-muted">Published articles will appear here. Check back soon for the latest sports news!</p>
+          </div>
+        </div>
+        <?php endif; ?>
+      <?php else: ?>
+      <div class="col-12">
+        <div class="text-center py-5">
+          <h3>No News Articles Available</h3>
+          <p class="text-muted">We're working on bringing you the latest sports news. Please check back soon!</p>
         </div>
       </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=250&fit=crop" alt="Xavi Simons" class="img-fluid">
-            <div class="news-category">Transfer News</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Tottenham close in on shock Xavi Simons signing after hijacking Chelsea's deal</h4>
-            <p class="news-excerpt">Spurs are reportedly set to complete a surprise move for the Dutch midfielder...</p>
-            <div class="news-meta">
-              <span class="date">2h ago</span>
-              <span class="read-time">2 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=400&h=250&fit=crop" alt="West Ham" class="img-fluid">
-            <div class="news-category">Premier League</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Midfielder Mateus Fernandes joins West Ham in £40 million deal from Southampton</h4>
-            <p class="news-excerpt">The Portuguese midfielder completes his move to the London Stadium...</p>
-            <div class="news-meta">
-              <span class="date">3h ago</span>
-              <span class="read-time">3 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=250&fit=crop" alt="Bayern Munich" class="img-fluid">
-            <div class="news-category">Bundesliga</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Bundesliga clubs can't compete with Premier League spending power, says Kompany</h4>
-            <p class="news-excerpt">Bayern Munich manager discusses the financial gap between leagues...</p>
-            <div class="news-meta">
-              <span class="date">4h ago</span>
-              <span class="read-time">4 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Premier League Section -->
-      <div class="col-12 mb-4">
-        <div class="section-header">
-          <h3 class="section-title">Premier League</h3>
-          <a href="#" class="section-link">More Premier League →</a>
-        </div>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=400&h=250&fit=crop" alt="Fantasy Football" class="img-fluid">
-            <div class="news-category">Fantasy</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Fantasy Premier League: The best picks and hidden gems for Gameweek 3</h4>
-            <p class="news-excerpt">Our expert analysis of the top fantasy football picks for the upcoming gameweek...</p>
-            <div class="news-meta">
-              <span class="date">5h ago</span>
-              <span class="read-time">5 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=400&h=250&fit=crop" alt="Newcastle United" class="img-fluid">
-            <div class="news-category">Premier League</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Howe says Isak future at Newcastle remains uncertain as club close in on Woltemade</h4>
-            <p class="news-excerpt">Newcastle manager addresses speculation about the Swedish striker's future...</p>
-            <div class="news-meta">
-              <span class="date">6h ago</span>
-              <span class="read-time">3 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=400&h=250&fit=crop" alt="Liverpool Arsenal" class="img-fluid">
-            <div class="news-category">Premier League</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Slot coy on Isak chances as Liverpool prepare for blockbuster Arsenal battle</h4>
-            <p class="news-excerpt">The Reds manager previews the highly anticipated clash with the Gunners...</p>
-            <div class="news-meta">
-              <span class="date">7h ago</span>
-              <span class="read-time">4 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Tennis Section -->
-      <div class="col-12 mb-4">
-        <div class="section-header">
-          <h3 class="section-title">Tennis - US Open</h3>
-          <a href="#" class="section-link">More Tennis →</a>
-        </div>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=250&fit=crop" alt="US Open Tennis" class="img-fluid">
-            <div class="news-category">US Open</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">US Open LIVE: Rybakina takes on Raducanu in huge clash, Alcaraz in early action</h4>
-            <p class="news-excerpt">Day six of the US Open features blockbuster matches including Emma Raducanu vs Elena Rybakina...</p>
-            <div class="news-meta">
-              <span class="date">1h ago</span>
-              <span class="read-time">Live</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1622163642998-1ea32b0bbc85?w=400&h=250&fit=crop" alt="Tommy Paul" class="img-fluid">
-            <div class="news-category">US Open</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Tommy Paul battles through late-night classic against Nuno Borges at US Open</h4>
-            <p class="news-excerpt">The American overcame a tough challenge in an entertaining late-night encounter...</p>
-            <div class="news-meta">
-              <span class="date">8h ago</span>
-              <span class="read-time">3 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="news-card">
-          <div class="news-image">
-            <img src="https://images.unsplash.com/photo-1630766803227-c5d5ff96a5b0?w=400&h=250&fit=crop" alt="Coco Gauff" class="img-fluid">
-            <div class="news-category">US Open</div>
-          </div>
-          <div class="news-content">
-            <h4 class="news-title">Coco Gauff gets through serving woes in difficult match to make US Open third round</h4>
-            <p class="news-excerpt">The defending champion overcame early struggles to advance at Flushing Meadows...</p>
-            <div class="news-meta">
-              <span class="date">10h ago</span>
-              <span class="read-time">4 min read</span>
-            </div>
-          </div>
-        </article>
-      </div>
+      <?php endif; ?>
     </div>
   </div>
 
   <!-- Load More Button -->
+  <?php if (count($published_news) > 6): ?>
   <div class="text-center mt-4">
     <button class="btn btn-outline-primary btn-lg load-more-news">Load More Articles</button>
   </div>
+  <?php endif; ?>
 </div>
 
 <?php include 'templates/footer.php'; ?>
@@ -295,8 +176,18 @@ document.querySelectorAll('.category-tab').forEach(tab => {
         
         const category = this.dataset.category;
         
-        // Simple filter simulation (in real app, this would filter actual content)
-        console.log('Filtering by category:', category);
+        // Filter articles by category
+        const articles = document.querySelectorAll('.news-card');
+        articles.forEach(article => {
+            const articleCategory = article.querySelector('.news-category').textContent.toLowerCase();
+            const parentCard = article.closest('.col-md-6, .col-lg-4');
+            
+            if (category === 'all' || articleCategory.includes(category.toLowerCase())) {
+                parentCard.style.display = 'block';
+            } else {
+                parentCard.style.display = 'none';
+            }
+        });
     });
 });
 
@@ -307,7 +198,7 @@ document.querySelector('.load-more-news')?.addEventListener('click', function() 
     // Simulate loading
     setTimeout(() => {
         this.innerHTML = 'Load More Articles';
-        // In real implementation, this would load more articles
+        // In real implementation, this would load more articles via AJAX
     }, 1000);
 });
 </script>

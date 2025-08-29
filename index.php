@@ -4,6 +4,7 @@ require_once 'config.php';
 require_once 'Database.php';
 require_once 'User.php';
 require_once 'StreamManager.php';
+require_once 'NewsManager.php';
 
 // Rate limiting (basic implementation using session)
 if (!isset($_SESSION['rate_limit'])) {
@@ -55,7 +56,7 @@ switch ($route) {
         break;
     case '/admin':
         if ($method === 'POST') {
-            handleAdminAddStream();
+            handleAdminSubmission();
         } else {
             showAdminPage();
         }
@@ -227,12 +228,23 @@ function showAdminPage() {
     include 'templates/admin.php';
 }
 
-function handleAdminAddStream() {
+function handleAdminSubmission() {
     if (!isset($_SESSION['admin'])) {
         header('Location: /admin-login');
         exit;
     }
     
+    $action = $_POST['action'] ?? '';
+    
+    if ($action === 'add_news') {
+        handleAddNews();
+    } else {
+        // Default to stream handling for backwards compatibility
+        handleAddStream();
+    }
+}
+
+function handleAddStream() {
     $title = $_POST['title'] ?? '';
     $platform = $_POST['platform'] ?? '';
     $video_id = $_POST['video_id'] ?? '';
@@ -247,6 +259,106 @@ function handleAdminAddStream() {
     ]);
     
     StreamManager::saveStreams($streams);
+    $_SESSION['message'] = 'Stream added successfully!';
+    $_SESSION['message_type'] = 'success';
+    header('Location: /admin');
+    exit;
+}
+
+function handleAddNews() {
+    // Handle file uploads first
+    $featured_image_path = '';
+    $additional_images = [];
+    
+    // Create uploads directory if it doesn't exist
+    $upload_dir = 'uploads/news/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    // Handle featured image upload
+    if (isset($_FILES['featured_image']) && $_FILES['featured_image']['error'] === UPLOAD_ERR_OK) {
+        $file_extension = strtolower(pathinfo($_FILES['featured_image']['name'], PATHINFO_EXTENSION));
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        if (in_array($file_extension, $allowed_extensions)) {
+            $featured_image_filename = uniqid() . '_featured.' . $file_extension;
+            $featured_image_path = $upload_dir . $featured_image_filename;
+            
+            if (move_uploaded_file($_FILES['featured_image']['tmp_name'], $featured_image_path)) {
+                // Success
+            } else {
+                $featured_image_path = '';
+            }
+        }
+    }
+    
+    // Handle additional images
+    if (isset($_FILES['additional_images']) && is_array($_FILES['additional_images']['name'])) {
+        foreach ($_FILES['additional_images']['name'] as $key => $name) {
+            if ($_FILES['additional_images']['error'][$key] === UPLOAD_ERR_OK) {
+                $file_extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                
+                if (in_array($file_extension, $allowed_extensions)) {
+                    $additional_filename = uniqid() . '_additional.' . $file_extension;
+                    $additional_path = $upload_dir . $additional_filename;
+                    
+                    if (move_uploaded_file($_FILES['additional_images']['tmp_name'][$key], $additional_path)) {
+                        $additional_images[] = $additional_path;
+                    }
+                }
+            }
+        }
+    }
+    
+    // Determine status based on which button was clicked
+    $status = 'draft'; // default
+    if (isset($_POST['publish'])) {
+        $status = 'published';
+    } elseif (isset($_POST['save_draft'])) {
+        $status = 'draft';
+    }
+    
+    // Prepare article data
+    $article = [
+        'title' => $_POST['news_title'] ?? '',
+        'slug' => $_POST['news_slug'] ?? '',
+        'excerpt' => $_POST['news_excerpt'] ?? '',
+        'content' => $_POST['news_content'] ?? '',
+        'category' => $_POST['new_category'] ?: ($_POST['news_category'] ?? ''),
+        'tags' => $_POST['news_tags'] ?? '',
+        'status' => $status,
+        'featured' => isset($_POST['featured_article']) ? 1 : 0,
+        'allow_comments' => isset($_POST['allow_comments']) ? 1 : 0,
+        'featured_image' => $featured_image_path,
+        'additional_images' => implode(',', $additional_images),
+        'seo_title' => $_POST['seo_title'] ?? '',
+        'seo_description' => $_POST['seo_description'] ?? '',
+        'publish_date' => $_POST['publish_date'] ?? null,
+        'author' => 'Admin' // Could be dynamic based on logged-in user
+    ];
+    
+    // Validate required fields
+    if (empty($article['title']) || empty($article['content']) || empty($article['category'])) {
+        $_SESSION['message'] = 'Please fill in all required fields (title, content, category).';
+        $_SESSION['message_type'] = 'danger';
+        header('Location: /admin');
+        exit;
+    }
+    
+    // Add the article
+    $article_id = NewsManager::addArticle($article);
+    
+    if ($article_id) {
+        $status_message = $article['status'] === 'published' ? 'published' : 'saved as ' . $article['status'];
+        $_SESSION['message'] = "Article '{$article['title']}' has been {$status_message} successfully!";
+        $_SESSION['message_type'] = 'success';
+    } else {
+        $_SESSION['message'] = 'Error saving the article. Please try again.';
+        $_SESSION['message_type'] = 'danger';
+    }
+    
     header('Location: /admin');
     exit;
 }
