@@ -2,7 +2,7 @@
 
 This is a PHP-based live streaming platform called "PCYBER TV" that allows users to view sports streams and participate in live chat. The platform features a public interface for viewing streams, an admin dashboard for managing content, and a real-time chat system. The application supports both YouTube and Facebook video embeds, with category-based organization and pagination for better user experience.
 
-**Status**: Successfully converted to pure PHP implementation with modern admin dashboard styling. All Python files and HTML templates removed, running clean PHP-only setup on port 5000.
+**Status**: Successfully imported and configured in Replit environment. Pure PHP implementation with modern admin dashboard styling running on port 5000. All routes, templates, and database functionality working correctly. Deployment configured for autoscale target.
 
 # User Preferences
 
@@ -11,13 +11,15 @@ Preferred communication style: Simple, everyday language.
 # System Architecture
 
 ## Frontend Architecture
-The application uses server-side templating with PHP includes and Bootstrap 5 for responsive design. It implements a dual-theme system (light/dark mode) with CSS custom properties for consistent styling across all pages. The interface includes:
+The application uses server-side templating with PHP includes and Bootstrap 5 for responsive design. Template structure follows a consistent header/footer include pattern with proper variable passing. It implements a dual-theme system (light/dark mode) with CSS custom properties for consistent styling across all pages. The interface includes:
 
-- Public stream viewing pages with embedded video players
+- Public stream viewing pages with embedded video players (YouTube/Facebook)
 - Admin dashboard with stream management capabilities  
 - User authentication forms with modern glass-morphism design
-- Real-time chat interface with profanity filtering
+- Real-time chat interface with profanity filtering and rate limiting
 - Responsive navigation with sticky header
+- Category-based stream filtering and pagination
+- AJAX-powered "Load More" functionality for streams
 
 ## Backend Architecture
 Built with PHP and a modular structure separating concerns:
