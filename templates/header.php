@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title><?php echo isset($page_title) ? $page_title : 'PCYBER TV - Live Sports Streaming'; ?></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="assets/styles.css" rel="stylesheet" />
+  <style>
+    <?php include 'assets/styles.css'; ?>
+  </style>
 </head>
 <body class="dark-mode">
   <!-- Flashscore Header -->
