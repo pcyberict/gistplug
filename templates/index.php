@@ -1,6 +1,6 @@
 <?php
 $page_title = 'PCYBER TV - Live Sports Streaming';
-$current_page = 'home';
+$current_page = 'streams';
 $stream_count = count(StreamManager::loadStreams());
 include 'templates/header.php';
 ?>

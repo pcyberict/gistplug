@@ -30,13 +30,13 @@
     <nav class="main-nav">
       <div class="nav-left">
         <div class="nav-tabs">
-          <a href="/" class="nav-tab <?php echo (isset($current_page) && $current_page === 'home') ? 'active' : ''; ?>">
+          <a href="/news" class="nav-tab <?php echo (isset($current_page) && $current_page === 'news') ? 'active' : ''; ?>">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
             NEWS
           </a>
-          <a href="/" class="nav-tab <?php echo (isset($current_page) && $current_page === 'streams') ? 'active' : ''; ?>">
+          <a href="/" class="nav-tab <?php echo (!isset($current_page) || $current_page === 'streams' || $current_page === 'home') ? 'active' : ''; ?>">
             <svg class="nav-icon" viewBox="0 0 24 24">
               <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
             </svg>

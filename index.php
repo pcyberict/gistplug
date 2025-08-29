@@ -23,6 +23,9 @@ switch ($route) {
     case '/':
         showHomePage();
         break;
+    case '/news':
+        showNewsPage();
+        break;
     case '/login':
         if ($method === 'POST') {
             handleLogin();
@@ -95,6 +98,10 @@ function showHomePage() {
     $streams = StreamManager::loadStreams();
     $initial_streams = array_slice($streams, 0, 6);
     include 'templates/index.php';
+}
+
+function showNewsPage() {
+    include 'templates/news.php';
 }
 
 function showLoginPage() {
