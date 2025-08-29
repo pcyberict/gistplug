@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Sports Streams</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #f8f9fa;
+      --text-color: #212529;
+      --card-bg: #ffffff;
+      --accent: #0d6efd;
+      --badge-bg: #e9ecef;
+      
+      /* Header always uses dark colors */
+      --header-bg-color: #01002c;
+      --header-text-color: #f1f1f1;
+      --header-card-bg: rgba(255, 255, 255, 0.05);
+      --header-badge-bg: #1a1e2d;
+    }
+   
+    body.dark-mode {
+      --bg-color: #01002c;               /* Very dark navy */
+      --text-color: #f1f1f1;             /* Light text */
+      --card-bg: rgba(255, 255, 255, 0.05); /* Semi-transparent glass card */
+      --accent: #4dabf7;                 /* Soft blue accent */
+      --badge-bg: #1a1e2d;               /* Refined dark for badges */
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* Default to dark mode */
+    body {
+      background: #01002c;
+      color: #f1f1f1;
+    }
+
+    body.light-mode {
+      background: #f8f9fa;
+      color: #212529;
+    }
+
+    body.dark-mode {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Flashscore Header Styles - Always Dark */
+    .flashscore-header {
+      background-color: var(--header-bg-color);
+      color: var(--header-text-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--header-badge-bg);
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--header-badge-bg);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--header-text-color);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 24px;
+      margin-right: 8px;
+      background: linear-gradient(45deg, #ff6b35, #f7931e);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .logo-icon::before {
+      content: '';
+      width: 16px;
+      height: 12px;
+      background: white;
+      border-radius: 2px;
+      transform: skew(-10deg);
+    }
+
+    .right-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-icon, .user-icon, .menu-icon {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      fill: var(--header-text-color);
+      transition: fill 0.2s;
+      opacity: 0.7;
+    }
+
+    .search-icon:hover, .user-icon:hover, .menu-icon:hover {
+      opacity: 1;
+    }
+
+    /* Updated Main Navigation - PC Mode Aligned */
+    .main-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background-color: var(--header-bg-color);
+      height: 48px;
+      position: relative;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      gap: 0;
+    }
+
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      height: 100%;
+      color: var(--header-text-color);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .nav-tab:hover {
+      background-color: var(--header-card-bg);
+      border-bottom-color: #ff6b35;
+      color: var(--header-text-color);
+    }
+
+    .nav-tab.active {
+      border-bottom-color: #ff6b35;
+      background-color: var(--header-card-bg);
+    }
+
+    .nav-tab.scores {
+      background-color: var(--header-card-bg);
+      border-bottom-color: #ff6b35;
+    }
+
+    .nav-tab.news {
+      opacity: 0.7;
+    }
+
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      fill: currentColor;
+    }
+
+    /* Sports Navigation - Now in same line */
+    .sports-nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .favorite-icon {
+      width: 20px;
+      height: 20px;
+      fill: var(--header-text-color);
+      cursor: pointer;
+      transition: fill 0.2s;
+      opacity: 0.7;
+      position: relative;
+    }
+
+    .favorite-icon:hover {
+      fill: #ff6b35;
+      opacity: 1;
+    }
+
+    .sport-link {
+      color: var(--header-text-color);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+
+    .sport-link:hover {
+      color: var(--header-text-color);
+      border-bottom-color: #ff6b35;
+      opacity: 1;
+    }
+
+    .sport-link.active {
+      color: var(--header-text-color);
+      border-bottom-color: #ff6b35;
+      opacity: 1;
+    }
+
+    .theme-toggle-header {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--header-text-color);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle-header:hover {
+      background-color: var(--header-card-bg);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #ff6b35;
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .more-sports {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: var(--header-text-color);
+      transition: color 0.2s;
+      opacity: 0.7;
+    }
+
+    .more-sports:hover {
+      opacity: 1;
+    }
+
+    .dropdown-arrow {
+      width: 16px;
+      height: 16px;
+      margin-left: 4px;
+      fill: currentColor;
+    }
+
+    /* Main Content Styles */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--card-bg);
+    }
+
+    .search-bar {
+      width: 100%;
+      border-radius: 30px;
+      border: 1.5px solid #ced4da;
+      padding: 0.5rem 1rem;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      margin-bottom: 2rem;
+    }
+
+    /* Light mode specific styles for main content */
+    body.light-mode .search-bar {
+      background-color: #ffffff;
+      color: #212529;
+    }
+
+    .streams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+    }
+
+    .stream-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .card {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .stream-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 20px rgba(13, 110, 253, 0.2);
+    }
+
+    /* Light mode stream cards */
+    body.light-mode .stream-card {
+      background: #ffffff;
+      box-shadow: 0 4px 15px rgba(13, 110, 253, 0.1);
+    }
+
+    body.light-mode .stream-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 6px 20px rgba(13, 110, 253, 0.2);
+    }
+
+    /* Dark mode stream cards */
+    body.dark-mode .stream-card {
+      background: var(--card-bg);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    body.dark-mode .stream-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .stream-video {
+      position: relative;
+      padding-top: 56.25%;
+      overflow: hidden;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .stream-video iframe {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      border: none;
+    }
+
+    .stream-content {
+      padding: 1rem;
+      flex-grow: 1;
+    }
+
+    .stream-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-category {
+      background-color: #c80037a3;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: var(--text-color);
+      padding: 4px 10px 4px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Light mode badge */
+    body.light-mode .badge-category {
+      background-color: #e9ecef;
+      color: #212529;
+    }
+
+    .badge-category:hover {
+      background-color: var(--accent);
+      color: white;
+    }
+
+    .btn-view {
+      padding: 0.5rem 1.2rem;
+      font-weight: 600;
+      border-radius: 25px;
+    }
+
+    .admin-link {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .admin-link a {
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      padding: 0.6rem 1.6rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .admin-link a:hover {
+      background-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Light mode admin link */
+    body.light-mode .admin-link a {
+      color: #0d6efd;
+      border-color: #0d6efd;
+    }
+
+    body.light-mode .admin-link a:hover {
+      background-color: #0d6efd;
+      color: #fff;
+    }
+
+    /* Mobile Responsive - FIXED FOR FLASHSCORE LAYOUT */
+    @media (max-width: 768px) {
+      .main-nav {
+        flex-direction: column;
+        height: auto;
+        padding: 0;
+        position: relative;
+      }
+
+      .nav-left {
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      /* First row: SCORES and NEWS tabs */
+      .nav-tabs {
+        width: 100%;
+        height: 48px;
+        border-bottom: 1px solid var(--header-badge-bg);
+        justify-content: flex-start;
+        gap: 0;
+      }
+
+      .nav-tab {
+        flex: 1;
+        justify-content: center;
+        text-align: center;
+        height: 48px;
+        padding: 0 16px;
+        min-width: 0;
+      }
+
+      /* Second row: Sports navigation */
+      .sports-nav {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 12px 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 20px;
+      }
+      
+      .sports-nav::-webkit-scrollbar {
+        display: none;
+      }
+
+      .sport-link {
+        font-size: 12px;
+        white-space: nowrap;
+        padding: 8px 0;
+      }
+
+      .favorite-icon {
+        width: 18px;
+        height: 18px;
+      }
+
+      .more-sports {
+        white-space: nowrap;
+      }
+
+      /* Theme toggle positioned in top right */
+      .theme-toggle-header {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+      }
+
+      /* Mobile adjustments for content */
+      .btn-view {
+        width: 100%;
+        text-align: center;
+      }
+
+      .streams-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 0 0.5rem;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 480px) {
+      .nav-tab {
+        font-size: 12px;
+        padding: 0 8px;
+      }
+
+      .nav-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+      }
+
+      .sports-nav {
+        padding: 12px 12px;
+        gap: 16px;
+      }
+
+      .sport-link {
+        font-size: 11px;
+      }
+
+      .theme-toggle-header {
+        right: 12px;
+        margin-top: -20px;
+      }
+    }
+  </style>
+</head>
+<body class="dark-mode">
+  <!-- Flashscore Header -->
+  <header class="flashscore-header">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <a href="/" class="logo">
+        <div class="logo-icon"></div>
+        GISTPLUG
+      </a>
+  
+      <div class="right-nav">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <div style="position: relative;">
+          <svg class="user-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <svg class="menu-icon" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <div class="nav-left">
+        <div class="nav-tabs">
+          <a href="#" class="nav-tab" id="scoresTab" onclick="switchTab('scores')">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            SCORES
+          </a>
+          <a href="#" class="nav-tab" id="newsTab" onclick="switchTab('news')">
+            <svg class="nav-icon" viewBox="0 0 24 24">
+              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+            </svg>
+            NEWS
+          </a>
+        </div>
+        <div class="sports-nav">
+          <div style="position: relative;">
+            <svg class="favorite-icon" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <div class="notification-badge">9</div>
+          </div>
+          <a href="#" class="sport-link active">FOOTBALL</a>
+          <a href="#" class="sport-link">BASKETBALL</a>
+          <a href="#" class="sport-link">TENNIS</a>
+          <a href="#" class="sport-link">ICE HOCKEY</a>
+          <a href="#" class="sport-link">HANDBALL</a>
+          <div class="more-sports">
+            <svg class="dropdown-arrow" viewBox="0 0 24 24">
+              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <button class="theme-toggle-header" onclick="toggleTheme()" title="Toggle Light/Dark">☀️</button>
+    </nav>
+  </header>
+
+  <div class="container text-center">
+    <h2 class="fw-bold">{{ stream.title }}</h2>
+    {% if stream.description %}
+      <p class="text-muted">{{ stream.description }}</p>
+    {% endif %}
+    <a href="/category/{{ stream.category | url_encode }}" class="badge-category">{{ stream.category }}</a>
+  </div>
+
+  <!-- Full Width Video -->
+ 
+         <div class="stream-card">
+        <div class="stream-video">
+    {% if stream.platform == 'YouTube' %}
+      <iframe class="video-frame" src="https://www.youtube.com/embed/{{ stream.video_id }}?autoplay=1" allowfullscreen></iframe>
+    {% elif stream.platform == 'Twitch' %}
+      <iframe class="video-frame" src="https://player.twitch.tv/?channel={{ stream.video_id }}&parent=localhost&autoplay=true" allowfullscreen></iframe>
+    {% elif stream.platform == 'Facebook' %}
+      <iframe class="video-frame" src="https://www.facebook.com/plugins/video.php?href={{ stream.video_id | url_encode }}&show_text=0&width=560" allowfullscreen></iframe>
+    {% endif %}
+  </div>
+
+  <!-- Chat Section -->
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-12">
+        {% if stream.platform == 'YouTube' %}
+          <iframe class="chat-frame" src="https://www.youtube.com/live_chat?v={{ stream.video_id }}&embed_domain=localhost"></iframe>
+        {% elif stream.platform == 'Twitch' %}
+          <iframe class="chat-frame" src="https://www.twitch.tv/embed/{{ stream.video_id }}/chat?parent=localhost"></iframe>
+        {% elif stream.platform == 'Facebook' %}
+          <div class="text-muted p-3">Facebook does not support embedded live chat.</div>
+          <div class="local-chat" id="fbLocalChat"></div>
+          <form class="local-chat-form d-flex gap-2 mt-2" onsubmit="return addLocalFB(this)">
+            <input name="user" class="form-control" placeholder="Your name" required />
+            <input name="msg" class="form-control" placeholder="Message" required />
+            <button type="submit" class="btn btn-primary">Send</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/" class="btn btn-outline-primary">← Back to Home</a>
+  </div>
+</div></div>
+<!-- Main script: fixes tab toggle, stream controls, search, theme -->
+  <script>
+    function toggleTheme() {
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      if (isDarkMode) {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        document.querySelector('.theme-toggle-header').textContent = '🌙';
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.body.classList.remove('light-mode');
+        document.body.classList.add('dark-mode');
+        document.querySelector('.theme-toggle-header').textContent = '☀️';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        document.querySelector('.theme-toggle-header').textContent = '🌙';
+      } else {
+        document.body.classList.add('dark-mode');
+        document.querySelector('.theme-toggle-header').textContent = '☀️';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // SPORTS/NEWS tab handling
+      const scoresTab = document.getElementById('scoresTab');
+      const newsTab = document.getElementById('newsTab');
+      const sportsContent = document.getElementById('sportsContent');
+      const newsContent = document.getElementById('newsContent');
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      const noMoreMsg = document.getElementById('noMoreMsg');
+      const searchInput = document.getElementById('searchInput');
+      function updateLoadMoreVisibility() {
+        // On search or tab change: hide/show based on number of visible streams
+        if (!sportsContent || !loadMoreBtn || !noMoreMsg) return;
+        let anyVisible = false;
+        document.querySelectorAll('.stream-card').forEach(card => {
+          if (card.style.display !== 'none') anyVisible = true;
+        });
+        loadMoreBtn.style.display = anyVisible ? 'block' : 'none';
+        noMoreMsg.style.display = anyVisible ? 'none' : 'block';
+      }
+      // Initial
+      updateLoadMoreVisibility();
+
+      function showContent(contentType) {
+        if (contentType === 'sports') {
+          sportsContent.style.display = 'block';
+          newsContent.style.display = 'none';
+          scoresTab.classList.add('active');
+          newsTab.classList.remove('active');
+          searchInput.style.display = 'block';
+          updateLoadMoreVisibility();
+        } else if (contentType === 'news') {
+          sportsContent.style.display = 'none';
+          newsContent.style.display = 'block';
+          scoresTab.classList.remove('active');
+          newsTab.classList.add('active');
+          searchInput.style.display = 'none';
+          loadMoreBtn.style.display = 'none';
+          noMoreMsg.style.display = 'none';
+        }
+      }
+      scoresTab.addEventListener('click', function(e) {
+        e.preventDefault();
+        showContent('sports');
+      });
+      newsTab.addEventListener('click', function(e) {
+        e.preventDefault();
+        showContent('news');
+      });
+      // Ensure starting with sports
+      showContent('sports');
+
+      // Sport links active
+      document.querySelectorAll('.sport-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.querySelectorAll('.sport-link').forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+      // Favorite, search/menu icons
+      document.querySelector('.favorite-icon').addEventListener('click', function() {
+        this.style.fill = this.style.fill === 'rgb(255, 107, 53)' ? '#9ca3af' : '#ff6b35';
+      });
+      document.querySelector('.search-icon').addEventListener('click', function() {
+        if (sportsContent.style.display === 'block') {
+          searchInput.focus();
+          searchInput.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert('Search is only available for sports streams.');
+        }
+      });
+      document.querySelector('.menu-icon').addEventListener('click', function() {
+        alert('Mobile menu would be implemented here');
+      });
+      // --- SEARCH ---
+      searchInput.addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+        document.querySelectorAll('.stream-card').forEach(card => {
+          const title = card.querySelector('.stream-title').textContent.toLowerCase();
+          card.style.display = title.includes(keyword) ? 'block' : 'none';
+        });
+        updateLoadMoreVisibility();
+      });
+    });
+
+    // Load more streams as before (unchanged, still works)
+    let offset = {{ streams|length }};
+    const batchSize = 6;
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const noMoreMsg = document.getElementById('noMoreMsg');
+    loadMoreBtn.addEventListener('click', () => {
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.textContent = 'Loading...';
+      fetch(`/load_more_streams?offset=${offset}&limit=${batchSize}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.streams && data.streams.length > 0) {
+            const streamList = document.getElementById('streamList');
+            data.streams.forEach((stream, i) => {
+              const card = document.createElement('div');
+              card.className = 'stream-card';
+              let iframeSrc = '';
+              if (stream.platform === 'YouTube') {
+                iframeSrc = `https://www.youtube.com/embed/${stream.video_id}`;
+              } else if (stream.platform === 'Twitch') {
+                iframeSrc = `https://player.twitch.tv/?channel=${stream.video_id}&parent=localhost`;
+              } else if (stream.platform === 'Facebook') {
+                iframeSrc = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(stream.video_id)}&show_text=0&width=560`;
+              }
+              card.innerHTML = `
+                <div class="stream-video">
+                  ${iframeSrc ? `<iframe src="${iframeSrc}" allowfullscreen></iframe>` : `<p class="text-danger p-3">Unsupported platform</p>`}
+                </div>
+                <div class="stream-content">
+                  <div class="stream-title">${escapeHTML(stream.title)}</div>
+                  <a href="/category/${encodeURIComponent(stream.category)}" class="badge-category text-decoration-none">${escapeHTML(stream.category)}</a><br>
+                  <a href="/stream/${offset + i}" class="btn btn-primary btn-view">View Stream</a>
+                </div>
+              `;
+              streamList.appendChild(card);
+            });
+            offset += data.streams.length;
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = 'Load More Streams';
+            if (!data.has_more) {
+              loadMoreBtn.style.display = 'none';
+              noMoreMsg.style.display = 'block';
+            }
+          } else {
+            loadMoreBtn.style.display = 'none';
+            noMoreMsg.style.display = 'block';
+          }
+        })
+        .catch(err => {
+          console.error('Load failed:', err);
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.textContent = 'Load More Streams';
+        });
+    });
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[m]);
+    }
+  </script>
+   <!-- FOOTER CSS - Add this to your existing <style> section -->
+<style>
+/* Footer Styles - Always uses dark colors like header */
+:root {
+  --footer-bg-color: #01002c;
+  --footer-text-color: #f1f1f1;
+  --footer-card-bg: rgba(255, 255, 255, 0.05);
+  --footer-badge-bg: #1a1e2d;
+  --footer-accent: #4dabf7;
+}
+
+/* Desktop Footer */
+.desktop-footer {
+  background-color: var(--footer-bg-color);
+  color: var(--footer-text-color);
+  padding: 3rem 0 1rem;
+  margin-top: 4rem;
+  border-top: 1px solid var(--footer-badge-bg);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section h3 {
+  color: var(--footer-text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section ul li a {
+  color: var(--footer-text-color);
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.2s, color 0.2s;
+  font-size: 0.9rem;
+}
+
+.footer-section ul li a:hover {
+  opacity: 1;
+  color: var(--footer-accent);
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--footer-card-bg);
+  border-radius: 50%;
+  color: var(--footer-text-color);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background-color: var(--footer-accent);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.social-link svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--footer-badge-bg);
+  padding-top: 1.5rem;
+  text-align: center;
+}
+
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--footer-text-color);
+}
+
+.footer-logo-icon {
+  width: 24px;
+  height: 18px;
+  margin-right: 8px;
+  background: linear-gradient(45deg, #ff6b35, #f7931e);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.footer-logo-icon::before {
+  content: '';
+  width: 12px;
+  height: 9px;
+  background: white;
+  border-radius: 1px;
+  transform: skew(-10deg);
+}
+
+.footer-legal {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-legal a {
+  color: var(--footer-text-color);
+  text-decoration: none;
+  opacity: 0.8;
+  font-size: 0.85rem;
+  transition: opacity 0.2s;
+}
+
+.footer-legal a:hover {
+  opacity: 1;
+}
+
+.footer-disclaimer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--footer-badge-bg);
+  font-size: 0.8rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+
+.betting-warning {
+  color: var(--footer-accent);
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+/* Mobile Sticky Footer */
+.mobile-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--footer-bg-color);
+  border-top: 1px solid var(--footer-badge-bg);
+  z-index: 999;
+  padding: 8px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--footer-text-color);
+  opacity: 0.7;
+  transition: all 0.2s;
+  padding: 8px 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+  opacity: 1;
+  color: var(--footer-accent);
+}
+
+.mobile-nav-item svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  margin-bottom: 2px;
+}
+
+.mobile-nav-item span {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Sports Category Grid */
+.sports-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.sports-grid a {
+  color: var(--footer-text-color);
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  font-size: 0.9rem;
+}
+
+.sports-grid a:hover {
+  opacity: 1;
+  color: var(--footer-accent);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .desktop-footer {
+    display: none;
+  }
+
+  .mobile-footer {
+    display: block;
+  }
+
+  /* Add bottom padding to main content to account for sticky footer */
+  body {
+    padding-bottom: 70px;
+  }
+
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-legal {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-footer {
+    display: none;
+  }
+
+  .desktop-footer {
+    display: block;
+  }
+
+  /* Remove bottom padding on desktop */
+  body {
+    padding-bottom: 0;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .mobile-nav-item span {
+    font-size: 9px;
+  }
+
+  .mobile-nav-item svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+</style>
+{% include 'footer.html' %}
+
+<!-- JAVASCRIPT - Add this to your existing <script> section -->
+<script>
+// Mobile footer navigation
+document.addEventListener('DOMContentLoaded', function() {
+  const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+  
+  mobileNavItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Remove active class from all items
+      mobileNavItems.forEach(navItem => navItem.classList.remove('active'));
+      
+      // Add active class to clicked item
+      this.classList.add('active');
+      
+      // Handle different navigation actions
+      const itemText = this.querySelector('span').textContent;
+      
+      switch(itemText) {
+        case 'Menu':
+          // Focus on search or scroll to top
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          break;
+        case 'Sports':
+          // Scroll to streams grid
+          document.querySelector('.streams-grid')?.scrollIntoView({ behavior: 'smooth' });
+          break;
+        case 'Betslip':
+          // Could open betslip modal or navigate to betslip page
+          console.log('Betslip clicked');
+          break;
+        case 'Join':
+          // Could open registration modal
+          console.log('Join clicked');
+          break;
+        case 'Account':
+          // Could open account menu or navigate to account page
+          console.log('Account clicked');
+          break;
+      }
+    });
+  });
+});
+</script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+    mobileNavItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        mobileNavItems.forEach(navItem => navItem.classList.remove('active'));
+        this.classList.add('active');
+        const itemText = this.querySelector('span').textContent;
+        switch(itemText) {
+          case 'Menu':
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            break;
+          case 'Sports':
+            document.querySelector('.streams-grid')?.scrollIntoView({ behavior: 'smooth' });
+            break;
+          case 'Betslip':
+            console.log('Betslip clicked');
+            break;
+          case 'Join':
+            console.log('Join clicked');
+            break;
+          case 'Account':
+            console.log('Account clicked');
+            break;
+        }
+      });
+    });
+  });
+  </script>
+  
+<script>
+  // Function to switch between tabs
+  function switchTab(tabName) {
+    // Remove "active" class from all tabs and contents
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    // Add "active" class to the selected tab and content
+    const tabElement = document.getElementById(tabName + 'Tab');
+    const contentElement = document.getElementById(tabName + 'Content');
+    if (tabElement && contentElement) {
+      tabElement.classList.add('active');
+      contentElement.classList.add('active');
+
+      // Save active tab to localStorage
+      localStorage.setItem('activeTab', tabName);
+    }
+  }
+
+  // Restore active tab on page load
+  function restoreActiveTab() {
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab === 'news') {
+      switchTab('news');
+    } else {
+      // Default is 'scores'
+      switchTab('scores');
+    }
+  }
+
+  // Restore the theme (your existing function, left unchanged)
+  function restoreTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const themeToggle = document.querySelector('.theme-toggle-header');
+
+    if (savedTheme === 'light') {
+      document.body.classList.remove('dark-mode');
+      document.body.classList.add('light-mode');
+      themeToggle.textContent = '🌙';
+    } else {
+      document.body.classList.remove('light-mode');
+      document.body.classList.add('dark-mode');
+      themeToggle.textContent = '☀️';
+    }
+  }
+
+  // Initialize after DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    restoreTheme();
+    restoreActiveTab();
+
+    // Set click events for tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        // get the tabName dynamically from the id (e.g. "scoresTab" -> "scores")
+        const tabName = this.id.replace('Tab', '').toLowerCase();
+        switchTab(tabName);
+      });
+    });
+  });
+</script>
+<script>
+  // Tab switching handler
+  function switchTab(tabName) {
+    // Remove active from all tabs, contents
+    document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+    document.getElementById('sportsContent').style.display = 'none';
+    document.getElementById('newsContent').style.display = 'none';
+
+    // Add active to selected
+    const tabElement = document.getElementById(tabName + 'Tab');
+    tabElement.classList.add('active');
+    if (tabName === 'scores') {
+      document.getElementById('sportsContent').style.display = 'block';
+      document.getElementById('searchInput').style.display = 'block';
+      document.getElementById('loadMoreBtn').style.display = 'block'; // or hide if needed
+      document.getElementById('noMoreMsg').style.display = 'none';
+    } else {
+      document.getElementById('newsContent').style.display = 'block';
+      document.getElementById('searchInput').style.display = 'none';
+      document.getElementById('loadMoreBtn').style.display = 'none';
+      document.getElementById('noMoreMsg').style.display = 'none';
+    }
+
+    // Store
+    localStorage.setItem('activeTab', tabName);
+  }
+
+  // Restore tab on load
+  function restoreActiveTab() {
+    const savedTab = localStorage.getItem('activeTab');
+    if (savedTab === 'news') {
+      switchTab('news');
+    } else {
+      switchTab('scores');
+    }
+  }
+
+  // SPORTS BAR: thick underline & persistence
+  function setActiveSport(sportLink) {
+    document.querySelectorAll('.sport-link').forEach(link => link.classList.remove('active'));
+    sportLink.classList.add('active');
+    // Persist using text or data-attribute for full safety
+    localStorage.setItem('activeSport', sportLink.textContent.trim());
+  }
+
+  function restoreActiveSport() {
+    const saved = localStorage.getItem('activeSport');
+    if (saved) {
+      const links = Array.from(document.querySelectorAll('.sport-link'));
+      const match = links.find(link => link.textContent.trim() === saved);
+      if (match) setActiveSport(match);
+    } else {
+      // Default: first sport
+      const first = document.querySelector('.sport-link');
+      if (first) setActiveSport(first);
+    }
+  }
+
+  // THEME persistence: already handled by your existing code
+
+  // Wait until DOM loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // --- THEME ---
+    restoreTheme();
+
+    // --- TABS ---
+    restoreActiveTab();
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        const tabName = this.id.replace('Tab', '').toLowerCase();
+        switchTab(tabName);
+      });
+    });
+
+    // --- SPORTS NAVIGATION ---
+    restoreActiveSport();
+    document.querySelectorAll('.sport-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        setActiveSport(this);
+        // Optional: filter streams for sport here!
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

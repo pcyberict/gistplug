@@ -1,0 +1,65 @@
+ :root {
+      --bg-color: #f8f9fa;
+      --text-color: #212529;
+      --card-bg: #fff;
+    }
+
+    body.dark-mode {
+      --bg-color: #01002c;
+      --text-color: #f1f1f1;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --accent: #4dabf7;
+      --badge-bg: #1a1e2d;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .logo {
+      max-width: 120px;
+      margin-bottom: 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 16px;
+      padding: 2rem 2.5rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-color);
+      opacity: 0.6;
+    }
+
+    .form-control:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Signup</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* Your CSS remains untouched here (same as provided) */
+    :root {
+      --bg-color: #f8f9fa;
+      --text-color: #212529;
+      --card-bg: #fff;
+      --input-bg: #ffffff;
+      --input-border: #ccc;
+      --accent: #0d6efd;
+    }
+
+    body.dark-mode {
+      --bg-color: #01002c;
+      --text-color: #f1f1f1;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --accent: #4dabf7;
+      --badge-bg: #1a1e2d;
+      --input-bg: #1a1e2d;
+      --input-border: #555;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .card {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: 100%;
+      max-width: 420px;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 1.2rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 40px 12px 15px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .form-control::placeholder {
+      color: var(--text-color);
+      opacity: 0.6;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+    }
+
+    .form-icon {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+
+    .strength {
+      text-align: left;
+      font-size: 0.85rem;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      color: var(--text-color);
+    }
+
+    .generator {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+
+    .generator button {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+    }
+
+    .generator .copy-icon {
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-color);
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+
+    .generator .copy-icon:hover {
+      opacity: 1;
+    }
+
+    .submit-btn {
+      background: #28a745;
+      color: white;
+      padding: 0.75rem;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background: #218838;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-color);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    p {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+
+  <div class="card">
+    <h2>Create an Account</h2>
+    <form action="signup.php" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <input type="text" name="fullname" placeholder="Full Name" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <input type="email" name="email" placeholder="Email" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <input type="file" name="avatar" accept="image/*" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <input type="password" name="password" id="password" placeholder="Password" class="form-control" required>
+        <i class="fas fa-eye form-icon" id="togglePassword"></i>
+      </div>
+
+      <div id="strength" class="strength">Password strength:</div>
+
+      <div class="generator">
+        <button type="button" onclick="generatePassword()">🔐 Generate Password</button>
+        <i class="fas fa-copy copy-icon" id="copyPassword" title="Copy password"></i>
+      </div>
+
+      <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+
+    <p>Already have an account? <a href="login">Login</a></p>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    const passwordInput = document.getElementById("password");
+    const strengthText = document.getElementById("strength");
+    const togglePassword = document.getElementById("togglePassword");
+    const copyBtn = document.getElementById("copyPassword");
+
+    passwordInput.addEventListener("input", () => {
+      const val = passwordInput.value;
+      const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/;
+      strengthText.textContent = "Password strength: " + (strong.test(val) ? "Strong ✅" : "Weak ❌");
+    });
+
+    togglePassword.addEventListener("click", () => {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+      togglePassword.classList.toggle("fa-eye-slash");
+    });
+
+    function generatePassword() {
+      const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$!%*?&";
+      let pass = "";
+      for (let i = 0; i < 12; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      passwordInput.value = pass;
+      strengthText.textContent = "Password strength: Strong ✅";
+    }
+
+    copyBtn.addEventListener("click", () => {
+      if (passwordInput.value) {
+        navigator.clipboard.writeText(passwordInput.value).then(() => {
+          copyBtn.title = "Copied!";
+          setTimeout(() => {
+            copyBtn.title = "Copy password";
+          }, 1500);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
