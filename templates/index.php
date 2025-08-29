@@ -47,39 +47,12 @@ include 'templates/header.php';
   <?php endif; ?>
   
   <div class="row mt-5">
-    <div class="col-md-8">
+    <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h4>Welcome to PCYBER TV</h4>
           <p>Your premier destination for live sports streaming and entertainment. Watch your favorite teams and events in high quality.</p>
         </div>
-      </div>
-    </div>
-    
-    <div class="col-md-4">
-      <div class="chat-container">
-        <h4>Live Chat</h4>
-        <div class="chat-messages">
-          <?php
-          $chat = StreamManager::loadChat();
-          foreach ($chat as $message):
-          ?>
-            <div class="mb-2">
-              <strong><?php echo htmlspecialchars($message['user']); ?>:</strong>
-              <?php echo htmlspecialchars($message['message']); ?>
-            </div>
-          <?php endforeach; ?>
-        </div>
-        
-        <form method="POST" action="/chat">
-          <div class="mb-3">
-            <input type="text" name="user" class="form-control" placeholder="Your name" required>
-          </div>
-          <div class="mb-3">
-            <textarea name="message" class="form-control" placeholder="Your message" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-success w-100">Send Message</button>
-        </form>
       </div>
     </div>
   </div>
