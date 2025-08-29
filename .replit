@@ -1,10 +1,10 @@
-modules = ["php-8.2", "web"]
+modules = ["php-8.2", "web", "postgresql-16"]
 [agent]
 expertMode = true
 
 [nix]
 channel = "stable-25_05"
-packages = ["arrow-cpp", "cacert", "cargo", "coreutils", "freetype", "geckodriver", "gitFull", "glibcLocales", "lcms2", "libffi", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "pkg-config", "playwright-driver", "rustc", "tcl", "tk", "zlib"]
+packages = ["arrow-cpp", "cacert", "cargo", "coreutils", "freetype", "geckodriver", "gitFull", "glibcLocales", "lcms2", "libffi", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "pkg-config", "playwright-driver", "rustc", "tcl", "tk", "zlib", "php82Extensions.pdo_pgsql", "php82Extensions.pgsql"]
 
 [workflows]
 runButton = "Project"

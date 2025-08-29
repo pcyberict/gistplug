@@ -1,7 +1,35 @@
 <?php
 class Config {
     // Database configuration
-    public static $db_path = 'instance/users.db';
+    public static $db_path = 'instance/users.db'; // Keep for backward compatibility
+    
+    // PostgreSQL Database configuration
+    public static function getDatabaseUrl() {
+        return $_ENV['DATABASE_URL'] ?? 'sqlite:instance/users.db';
+    }
+    
+    public static function isDatabasePostgreSQL() {
+        return strpos(self::getDatabaseUrl(), 'postgres') === 0;
+    }
+    
+    public static function getParsedDatabaseConfig() {
+        $database_url = $_ENV['DATABASE_URL'] ?? null;
+        
+        if (!$database_url || !self::isDatabasePostgreSQL()) {
+            return null;
+        }
+        
+        $parsed = parse_url($database_url);
+        
+        return [
+            'host' => $parsed['host'] ?? 'localhost',
+            'port' => $parsed['port'] ?? 5432,
+            'dbname' => ltrim($parsed['path'] ?? '', '/'),
+            'user' => $parsed['user'] ?? '',
+            'password' => $parsed['pass'] ?? '',
+            'sslmode' => 'require'
+        ];
+    }
     
     // Admin credentials
     public static $admin_username = 'admin';

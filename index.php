@@ -326,7 +326,7 @@ function handleAddNews() {
         'slug' => $_POST['news_slug'] ?? '',
         'excerpt' => $_POST['news_excerpt'] ?? '',
         'content' => $_POST['news_content'] ?? '',
-        'category' => $_POST['new_category'] ?: ($_POST['news_category'] ?? ''),
+        'category' => ($_POST['new_category'] ?? '') ?: ($_POST['news_category'] ?? ''),
         'tags' => $_POST['news_tags'] ?? '',
         'status' => $status,
         'featured' => isset($_POST['featured_article']) ? 1 : 0,
